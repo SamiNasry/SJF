@@ -1,30 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shortest Job First Visualization</title>
+  <title>Visualisation du Plus Court Temps d'Exécution (SJF)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto Mono', monospace;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 flex flex-col items-center p-4">
-  <h1 class="text-3xl font-bold mb-4">Shortest Job First (SJF) Visualization</h1>
+  <p class="text-sm text-gray-600 mb-2">Site web créé par <strong>Nasry Sami</strong> et <strong>Moussaif Fahd</strong> pour le module <em>Système d'exploitation</em>.</p>
+  <h1 class="text-3xl font-bold mb-4">Visualisation du Plus Court Temps d'Exécution (SJF)</h1>
   <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
     <div id="input-section" class="mb-4">
-      <h2 class="text-xl font-semibold mb-2">Input Processes</h2>
+      <h2 class="text-xl font-semibold mb-2">Entrée des processus</h2>
       <div class="flex mb-2">
-        <input id="num-processes" type="number" min="1" value="3" class="border p-2 mr-2 w-20" placeholder="Number of processes">
-        <button onclick="generateProcessInputs()" class="bg-blue-500 text-white px-4 py-2 rounded">Generate</button>
+        <input id="num-processes" type="number" min="1" value="3" class="border p-2 mr-2 w-20" placeholder="Nombre de processus">
+        <button onclick="generateProcessInputs()" class="bg-blue-500 text-white px-4 py-2 rounded">Générer</button>
       </div>
       <div id="process-inputs" class="space-y-2"></div>
     </div>
     <div class="flex justify-between mb-4">
-      <button onclick="runSJF(false)" class="bg-green-500 text-white px-4 py-2 rounded">Run Non-Preemptive SJF</button>
-      <button onclick="runSJF(true)" class="bg-purple-500 text-white px-4 py-2 rounded">Run Preemptive SJF (SRTF)</button>
+      <button onclick="runSJF(false)" class="bg-green-500 text-white px-4 py-2 rounded">Exécuter SJF Non-Préemptif</button>
+      <button onclick="runSJF(true)" class="bg-purple-500 text-white px-4 py-2 rounded">Exécuter SJF Préemptif (SRTF)</button>
     </div>
     <div id="output" class="mt-4"></div>
   </div>
   <div id="canvas-container" class="mt-4"></div>
+
+  <footer class="mt-8 text-center text-gray-600">
+    <p>Site web créé par <strong>Nasry Sami</strong> et <strong>Moussaif Fahd</strong> pour le module <em>Système d'exploitation</em>.</p>
+  </footer>
 
   <script>
     let processes = [];
@@ -37,9 +48,9 @@
       for (let i = 0; i < num; i++) {
         container.innerHTML += `
           <div>
-            <label>Process ${i + 1}:</label>
-            <input id="at${i}" type="number" min="0" placeholder="Arrival Time" class="border p-2 w-24 mx-2">
-            <input id="bt${i}" type="number" min="1" placeholder="Burst Time" class="border p-2 w-24">
+            <label>Processus ${i + 1} :</label>
+            <input id="at${i}" type="number" min="0" placeholder="Temps d'arrivée" class="border p-2 w-24 mx-2">
+            <input id="bt${i}" type="number" min="1" placeholder="Temps d'exécution" class="border p-2 w-24">
           </div>`;
       }
     }
@@ -127,8 +138,8 @@
 
     function displayResults() {
       const output = document.getElementById('output');
-      let html = '<h2 class="text-xl font-semibold mb-2">Results</h2>';
-      html += '<table class="w-full border-collapse border"><tr class="bg-gray-200"><th class="border p-2">Process</th><th class="border p-2">Arrival Time</th><th class="border p-2">Burst Time</th><th class="border p-2">Completion Time</th><th class="border p-2">Turnaround Time</th><th class="border p-2">Waiting Time</th></tr>';
+      let html = '<h2 class="text-xl font-semibold mb-2">Résultats</h2>';
+      html += '<table class="w-full border-collapse border"><tr class="bg-gray-200"><th class="border p-2">Processus</th><th class="border p-2">Temps d\'arrivée</th><th class="border p-2">Temps d\'exécution</th><th class="border p-2">Temps de fin</th><th class="border p-2">Temps de rotation</th><th class="border p-2">Temps d\'attente</th></tr>';
       processes.forEach(p => {
         html += `<tr><td class="border p-2">P${p.id}</td><td class="border p-2">${p.at}</td><td class="border p-2">${p.bt}</td><td class="border p-2">${p.ct}</td><td class="border p-2">${p.tat}</td><td class="border p-2">${p.wt}</td></tr>`;
       });
@@ -141,20 +152,9 @@
       const avgTat = tatSum / n;
       const avgWt = wtSum / n;
 
-      html += '<h3 class="text-lg font-semibold mt-4">Average Calculations</h3>';
-      html += '<p class="mt-2"><strong>Turnaround Time (TAT) = Completion Time (CT) - Arrival Time (AT)</strong></p>';
-      html += '<p><strong>Waiting Time (WT) = Turnaround Time (TAT) - Burst Time (BT)</strong></p>';
-      html += '<p><strong>Average TAT = (Sum of TATs) / Number of Processes</strong></p>';
-      html += '<p><strong>Average WT = (Sum of WTs) / Number of Processes</strong></p>';
-      html += '<ul class="list-disc pl-5 mt-2">';
-      processes.forEach(p => {
-        html += `<li>P${p.id}: TAT = ${p.ct} - ${p.at} = ${p.tat}, WT = ${p.tat} - ${p.bt} = ${p.wt}</li>`;
-      });
-      html += '</ul>';
-      html += `<p class="mt-2"><strong>Sum of TATs:</strong> ${processes.map(p => p.tat).join(' + ')} = ${tatSum}</p>`;
-      html += `<p><strong>Sum of WTs:</strong> ${processes.map(p => p.wt).join(' + ')} = ${wtSum}</p>`;
-      html += `<p><strong>Average TAT:</strong> ${tatSum} / ${n} = ${avgTat.toFixed(2)}</p>`;
-      html += `<p><strong>Average WT:</strong> ${wtSum} / ${n} = ${avgWt.toFixed(2)}</p>`;
+      html += '<h3 class="text-lg font-semibold mt-4">Calculs Moyens</h3>';
+      html += `<p><strong>Temps de rotation moyen :</strong> ${avgTat.toFixed(2)}</p>`;
+      html += `<p><strong>Temps d'attente moyen :</strong> ${avgWt.toFixed(2)}</p>`;
 
       output.innerHTML = html;
     }
